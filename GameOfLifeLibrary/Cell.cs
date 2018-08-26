@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameOfLifeLibrary
+﻿namespace GameOfLifeLibrary
 {
     public class Cell
     {
-        private CellState state;
+        protected CellState state;
 
         public enum CellState
         {
@@ -24,9 +18,36 @@ namespace GameOfLifeLibrary
         public CellState GetNextState(int numberOfNeighbours)
         {
             if (state == CellState.Alive)
+            {
                 return numberOfNeighbours == 2 || numberOfNeighbours == 3 ? CellState.Alive : CellState.Dead;
+            }
             else
+            {
                 return numberOfNeighbours == 3 ? CellState.Alive : CellState.Dead;
+            }
+        }
+
+        public bool Equals(Cell other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            return state == other.state;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null || obj.GetType() != GetType())
+            {
+                return false;
+            }
+            return Equals(obj as Cell);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

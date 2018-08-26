@@ -1,10 +1,9 @@
-﻿using System;
-using Xunit;
+﻿using System.Collections.Generic;
 using GameOfLifeLibrary;
+using Xunit;
 using static GameOfLifeLibrary.Cell;
-using System.Collections.Generic;
 
-namespace GameOfLifeLibraryTest
+namespace GameOfLifeLibraryTests
 {
     public class CellTest
     {
@@ -58,6 +57,87 @@ namespace GameOfLifeLibraryTest
                 CellState actual = cell.GetNextState(numberOfNeighbours);
 
                 Assert.Equal(expected, actual);
+            }
+        }
+
+        public class EqualsMethod
+        {
+            [Fact]
+            public void ShouldNotEqualsNull()
+            {
+                Cell cell = new Cell(CellState.Alive);
+
+                bool equals = cell.Equals(null);
+
+                Assert.False(equals);
+            }
+
+            [Fact]
+            public void ShouldNotEqualWithDifferentCellState()
+            {
+                Cell cell = new Cell(CellState.Alive);
+
+                bool equals = cell.Equals(new Cell(CellState.Dead));
+
+                Assert.False(equals);
+            }
+
+            [Fact]
+            public void ShouldEqualWithSameCellState()
+            {
+                Cell cell = new Cell(CellState.Alive);
+
+                bool equals = cell.Equals(new Cell(CellState.Alive));
+
+                Assert.True(equals);
+            }
+        }
+
+        public class EqualsObjectMethod
+        {
+            public class CellInheritanceTest : Cell
+            {
+                public CellInheritanceTest(CellState cellState) : base(cellState) { }
+            }
+
+            [Fact]
+            public void ShouldNotEqualsNull()
+            {
+                Cell cell = new Cell(CellState.Alive);
+
+                bool equals = ((object)cell).Equals(null);
+
+                Assert.False(equals);
+            }
+
+            [Fact]
+            public void ShouldNotEqualWithDifferentCellState()
+            {
+                Cell cell = new Cell(CellState.Alive);
+
+                bool equals = ((object)cell).Equals(new Cell(CellState.Dead));
+
+                Assert.False(equals);
+            }
+
+            [Fact]
+            public void ShouldEqualWithSameCellState()
+            {
+                Cell cell = new Cell(CellState.Alive);
+
+                bool equals = ((object)cell).Equals(new Cell(CellState.Alive));
+
+                Assert.True(equals);
+            }
+
+            [Fact]
+            public void ShouldNotEqualWithSameCellStateButInheritedClass()
+            {
+                Cell cell = new Cell(CellState.Alive);
+
+                bool equals = ((object)cell).Equals(new CellInheritanceTest(CellState.Alive));
+
+                Assert.False(equals);
             }
         }
     }
