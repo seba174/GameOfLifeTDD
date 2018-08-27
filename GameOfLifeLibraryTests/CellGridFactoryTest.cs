@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using GameOfLifeLibrary;
 using Xunit;
-using static GameOfLifeLibrary.Cell;
 
 namespace GameOfLifeLibraryTests
 {

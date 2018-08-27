@@ -2,22 +2,16 @@
 {
     public class Cell
     {
-        protected CellState state;
-
-        public enum CellState
-        {
-            Alive,
-            Dead
-        }
+        public CellState State { get; private set; }
 
         public Cell(CellState state)
         {
-            this.state = state;
+            this.State = state;
         }
 
         public CellState GetNextState(int numberOfNeighbours)
         {
-            if (state == CellState.Alive)
+            if (State.IsAlive())
             {
                 return numberOfNeighbours == 2 || numberOfNeighbours == 3 ? CellState.Alive : CellState.Dead;
             }
@@ -33,7 +27,7 @@
             {
                 return false;
             }
-            return state == other.state;
+            return State == other.State;
         }
 
         public override bool Equals(object obj)

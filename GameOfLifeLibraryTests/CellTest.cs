@@ -1,12 +1,30 @@
 ﻿using System.Collections.Generic;
 using GameOfLifeLibrary;
 using Xunit;
-using static GameOfLifeLibrary.Cell;
 
 namespace GameOfLifeLibraryTests
 {
     public class CellTest
     {
+        public class StateProperty
+        {
+            public static IEnumerable<object[]> States =
+                new List<object[]>
+                {
+                    new object[] {CellState.Alive},
+                    new object[] {CellState.Dead}
+                };
+
+            [Theory]
+            [MemberData(nameof(States))]
+            public void ShouldReturnItsState(CellState initial)
+            {
+                Cell cell = new Cell(initial);
+
+                Assert.Equal(initial, cell.State);
+            }
+        }
+
         public class GetNextStateMethod
         {
             public static IEnumerable<object[]> AliveTestData =
