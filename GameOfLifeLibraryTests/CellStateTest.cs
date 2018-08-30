@@ -88,6 +88,16 @@ namespace GameOfLifeLibraryTests
 
                 Assert.True(equals);
             }
+
+            [Fact]
+            public void ShouldNotEqualWithDifferentType()
+            {
+                CellState initial = CellState.Alive;
+
+                bool equals = ((object)initial).Equals(new Cell(CellState.Alive));
+
+                Assert.False(equals);
+            }
         }
     }
 }

@@ -34,8 +34,35 @@ namespace GameOfLifeLibraryTests
                 Universe universe = new Universe(CellGridFactory.FromCellStateArray(new CellState[,] { { X } }));
 
                 universe.Update();
+                CellState[,] actual = universe.GetState();
 
-                Assert.Equal(new CellState[,] { { O } }, universe.GetState());
+                Assert.Equal(new CellState[,] { { O } }, actual);
+            }
+
+            [Fact]
+            public void ShouldUpdateAllCells()
+            {
+                Universe universe = new Universe(CellGridFactory.FromCellStateArray(
+                    new CellState[,]
+                    {
+                        { X, X, X, O },
+                        { O, X, O, O },
+                        { X, O, X, X },
+                        { O, O, X, X }
+                    }));
+                CellState[,] expected =
+                    new CellState[,]
+                    {
+                        { X, X, X, O },
+                        { O, O, O, X },
+                        { O, O, O, X },
+                        { O, X, X, X }
+                    };
+
+                universe.Update();
+                CellState[,] actual = universe.GetState();
+
+                Assert.Equal(expected, actual);
             }
         }
     }

@@ -25,7 +25,7 @@ namespace GameOfLifeLibraryTests
             }
         }
 
-        public class GetNextStateMethod
+        public class UpdateMethod
         {
             public static IEnumerable<object[]> AliveTestData =
                 new List<object[]>
@@ -61,7 +61,8 @@ namespace GameOfLifeLibraryTests
             {
                 Cell cell = new Cell(CellState.Alive);
 
-                CellState actual = cell.GetNextState(numberOfNeighbours);
+                cell.Update(numberOfNeighbours);
+                CellState actual = cell.State;
 
                 Assert.Equal(expected, actual);
             }
@@ -72,7 +73,8 @@ namespace GameOfLifeLibraryTests
             {
                 Cell cell = new Cell(CellState.Dead);
 
-                CellState actual = cell.GetNextState(numberOfNeighbours);
+                cell.Update(numberOfNeighbours);
+                CellState actual = cell.State;
 
                 Assert.Equal(expected, actual);
             }

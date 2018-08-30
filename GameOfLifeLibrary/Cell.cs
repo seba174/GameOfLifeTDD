@@ -1,4 +1,6 @@
-﻿namespace GameOfLifeLibrary
+﻿using System;
+
+namespace GameOfLifeLibrary
 {
     public class Cell
     {
@@ -9,15 +11,15 @@
             this.State = state;
         }
 
-        public CellState GetNextState(int numberOfNeighbours)
+        public void Update(int numberOfNeighbours)
         {
             if (State.IsAlive())
             {
-                return numberOfNeighbours == 2 || numberOfNeighbours == 3 ? CellState.Alive : CellState.Dead;
+                State = numberOfNeighbours == 2 || numberOfNeighbours == 3 ? CellState.Alive : CellState.Dead;
             }
             else
             {
-                return numberOfNeighbours == 3 ? CellState.Alive : CellState.Dead;
+                State = numberOfNeighbours == 3 ? CellState.Alive : CellState.Dead;
             }
         }
 
@@ -39,9 +41,6 @@
             return Equals(obj as Cell);
         }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() => base.GetHashCode();
     }
 }
