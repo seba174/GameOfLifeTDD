@@ -4,10 +4,7 @@
     {
         private Cell[,] State { get; set; }
 
-        public Universe(Cell[,] cells)
-        {
-            State = cells;
-        }
+        public Universe(Cell[,] cells) => State = cells;
 
         public CellState[,] GetState()
         {
@@ -25,53 +22,75 @@
 
         public void Update()
         {
-            CellState[,] originalState = GetState();
+            int[,] aliveNeighboursCounts = GetAliveNeighboursCounts();
             for (int row = 0; row < State.GetLength(0); row++)
             {
                 for (int col = 0; col < State.GetLength(1); col++)
                 {
-                    int numberOfAliveNeighbours = GetNumberOfAliveNeighbours(originalState, row, col);
-                    State[row, col].Update(numberOfAliveNeighbours);
+                    State[row, col].Update(aliveNeighboursCounts[row, col]);
                 }
             }
         }
 
-        private int GetNumberOfAliveNeighbours(CellState[,] state, int row, int col)
+        private int[,] GetAliveNeighboursCounts()
         {
-            int numberOfAliveNeighbours = 0;
-
-            numberOfAliveNeighbours += GetNumberOfAliveNeighboursInRow(state, row - 1, col);
-            numberOfAliveNeighbours += GetCountIfCellIsAlive(state, row, col - 1);
-            numberOfAliveNeighbours += GetCountIfCellIsAlive(state, row, col + 1);
-            numberOfAliveNeighbours += GetNumberOfAliveNeighboursInRow(state, row + 1, col);
-
-            return numberOfAliveNeighbours;
-        }
-
-        private int GetNumberOfAliveNeighboursInRow(CellState[,] state, int row, int col)
-        {
-            int numberOfAliveNeighbours = 0;
-
-            if (row >= 0 && row < state.GetLength(0))
+            int[,] aliveNeighboursCounts = new int[State.GetLength(0), State.GetLength(1)];
+            for (int row = 0; row < State.GetLength(0); row++)
             {
-                numberOfAliveNeighbours += GetCountIfCellIsAlive(state, row, col - 1);
-                numberOfAliveNeighbours += GetCountIfCellIsAlive(state, row, col);
-                numberOfAliveNeighbours += GetCountIfCellIsAlive(state, row, col + 1);
-            }
-
-            return numberOfAliveNeighbours;
-        }
-
-        private int GetCountIfCellIsAlive(CellState[,] state, int row, int col)
-        {
-            if (col >= 0 && col < state.GetLength(1))
-            {
-                if (state[row, col].IsAlive())
+                for (int col = 0; col < State.GetLength(1); col++)
                 {
-                    return 1;
+                    aliveNeighboursCounts[row, col] = GetNumberOfAliveNeighbours(row, col);
                 }
             }
-            return 0;
+            return aliveNeighboursCounts;
+        }
+
+        private int GetNumberOfAliveNeighbours(int row, int col)
+        {
+            int numberOfAliveNeighbours = 0;
+
+            numberOfAliveNeighbours += GetNumberOfAliveNeighboursInRow(row - 1, col);
+            if (IsNeihbourAlive(row, col - 1))
+                numberOfAliveNeighbours++;
+            if (IsNeihbourAlive(row, col + 1))
+                numberOfAliveNeighbours++;
+            numberOfAliveNeighbours += GetNumberOfAliveNeighboursInRow(row + 1, col);
+
+            return numberOfAliveNeighbours;
+        }
+
+        private int GetNumberOfAliveNeighboursInRow(int row, int col)
+        {
+            int numberOfAliveNeighbours = 0;
+
+            if (IsNeihbourAlive(row, col - 1))
+                numberOfAliveNeighbours++;
+            if (IsNeihbourAlive(row, col))
+                numberOfAliveNeighbours++;
+            if (IsNeihbourAlive(row, col + 1))
+                numberOfAliveNeighbours++;
+
+            return numberOfAliveNeighbours;
+        }
+
+        private bool IsNeihbourAlive(int row, int col)
+        {
+            return GetCellStateSafely(row, col).IsAlive;
+        }
+
+        private CellState GetCellStateSafely(int row, int col)
+        {
+            return IsRowNumberValid(row) && IsColumnNumberValid(col) ? State[row, col].State : CellState.Dead;
+        }
+
+        private bool IsRowNumberValid(int row)
+        {
+            return row >= 0 && row < State.GetLength(0);
+        }
+
+        private bool IsColumnNumberValid(int col)
+        {
+            return col >= 0 && col < State.GetLength(1);
         }
     }
 }

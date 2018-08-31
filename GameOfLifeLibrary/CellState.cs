@@ -7,16 +7,11 @@
 
         private readonly int value;
 
-        public bool IsAlive() => this == Alive;
+        public bool IsAlive => this == Alive;
 
         public bool Equals(CellState other)
         {
-            if (other is null)
-            {
-                return false;
-            }
-
-            return value == other.value;
+            return other is null ? false : value == other.value;
         }
 
         public override bool Equals(object obj)
@@ -34,10 +29,7 @@
             return Equals(obj as CellState);
         }
 
-        public override int GetHashCode()
-        {
-            return value.GetHashCode();
-        }
+        public override int GetHashCode() => value.GetHashCode();
 
         private CellState() { }
 

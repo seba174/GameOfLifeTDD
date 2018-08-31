@@ -5,12 +5,12 @@ namespace GameOfLifeLibraryTests
 {
     public class CellStateTest
     {
-        public class IsAliveMethod
+        public class IsAliveProperty
         {
             [Fact]
             public void ShouldBeAliveWhenAliveCellState()
             {
-                bool isAlive = CellState.Alive.IsAlive();
+                bool isAlive = CellState.Alive.IsAlive;
 
                 Assert.True(isAlive);
             }
@@ -18,7 +18,7 @@ namespace GameOfLifeLibraryTests
             [Fact]
             public void ShouldNotBeAliveWhenDeadCellState()
             {
-                bool isAlive = CellState.Dead.IsAlive();
+                bool isAlive = CellState.Dead.IsAlive;
 
                 Assert.False(isAlive);
             }

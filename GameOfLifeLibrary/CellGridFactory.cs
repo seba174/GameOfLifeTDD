@@ -11,16 +11,16 @@ namespace GameOfLifeLibrary
                 throw new ArgumentNullException(nameof(states));
             }
 
-            Cell[,] cellGrid = new Cell[states.GetLength(0), states.GetLength(1)];
-            for (int i = 0; i < cellGrid.GetLength(0); i++)
+            Cell[,] cells = new Cell[states.GetLength(0), states.GetLength(1)];
+            for (int i = 0; i < cells.GetLength(0); i++)
             {
-                for (int j = 0; j < cellGrid.GetLength(1); j++)
+                for (int j = 0; j < cells.GetLength(1); j++)
                 {
-                    cellGrid[i, j] = new Cell(states[i, j]);
+                    cells[i, j] = new Cell(states[i, j]);
                 }
             }
 
-            return cellGrid;
+            return cells;
         }
     }
 }
