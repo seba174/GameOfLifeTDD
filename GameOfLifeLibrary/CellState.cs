@@ -1,4 +1,5 @@
-﻿namespace GameOfLifeLibrary
+﻿
+namespace GameOfLifeLibrary
 {
     public class CellState
     {
