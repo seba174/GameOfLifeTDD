@@ -4,24 +4,17 @@ using GameLoopLibrary;
 
 namespace GameLoopLibraryTest
 {
-    public class RenderBeforeUpdateException : Exception
-    {
-        public RenderBeforeUpdateException() { }
-
-        public RenderBeforeUpdateException(string message) : base(message) { }
-
-        public RenderBeforeUpdateException(string message, Exception innerException) : base(message, innerException) { }
-    }
-
     public class TestGame : IGame<TestInput>
     {
         public bool Running => runningAnswers.Dequeue();
 
         private Queue<bool> runningAnswers;
 
-        public int NumberOfUpdates { get; private set; }
+        public Action RenderAction { get; set; }
 
-        public int NumberOfRenders { get; private set; }
+        public int NumberOfUpdates { get; set; }
+
+        public int NumberOfRenders { get; set; }
 
         public TestInput UpdatedWithInput { get; set; }
 
@@ -29,6 +22,7 @@ namespace GameLoopLibraryTest
         {
             NumberOfRenders = 0;
             NumberOfUpdates = 0;
+            RenderAction = () => NumberOfRenders++;
         }
 
         public void Update(TestInput input)
@@ -39,12 +33,7 @@ namespace GameLoopLibraryTest
 
         public void Render()
         {
-            if (NumberOfRenders != NumberOfUpdates - 1)
-            {
-                throw new RenderBeforeUpdateException();
-            }
-
-            NumberOfRenders++;
+            RenderAction.Invoke();
         }
 
         public void EnqueRunningAnswers(params bool[] answers)
