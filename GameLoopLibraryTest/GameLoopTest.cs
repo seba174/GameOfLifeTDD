@@ -1,21 +1,25 @@
 ﻿using System;
 using GameLoopLibrary;
 using Xunit;
+using FakeItEasy;
 
 namespace GameLoopLibraryTest
 {
     public class GameLoopTest
     {
-        private readonly TestGame testGame;
-        private readonly TestInputHandler testInputHandler;
+        private readonly IGame<TestInput> testGame;
+        private readonly InputHandler<TestInput> testInputHandler;
         private readonly GameLoop<TestInput> gameLoop;
-        private readonly TestSecondsTimer testTimer;
+        private readonly ITimer testTimer;
 
         public GameLoopTest()
         {
-            testGame = new TestGame();
-            testInputHandler = new TestInputHandler();
-            testTimer = new TestSecondsTimer();
+            testGame = A.Fake<IGame<TestInput>>();
+            testInputHandler = A.Fake<InputHandler<TestInput>>();
+            testTimer = A.Fake<ITimer>();
+
+            double time = 0.0;
+            A.CallTo(() => testTimer.GetTime()).ReturnsLazily(() => time++);
 
             gameLoop = new GameLoop<TestInput>(testGame, testInputHandler, testTimer)
             {
@@ -26,96 +30,89 @@ namespace GameLoopLibraryTest
         [Fact]
         public void DoesNothingIfGameIsNotRunning()
         {
-            testGame.EnqueRunningAnswers(false);
+            A.CallTo(() => testGame.Running).Returns(false);
 
             gameLoop.Run();
 
-            Assert.Equal(0, testGame.NumberOfUpdates);
+            A.CallTo(() => testGame.Update(A<TestInput>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
         public void InvokesOneUpdateIfGameIsRunning()
         {
-            testGame.EnqueRunningAnswers(true, false);
+            A.CallTo(() => testGame.Running).ReturnsNextFromSequence(true, false);
 
             gameLoop.Run();
 
-            Assert.Equal(1, testGame.NumberOfUpdates);
+            A.CallTo(() => testGame.Update(A<TestInput>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
         public void InvokesUpdatesAsLongAsGameIsRunning()
         {
-            testGame.EnqueRunningAnswers(true, true, true, false);
+            A.CallTo(() => testGame.Running).ReturnsNextFromSequence(true, true, true, false);
 
             gameLoop.Run();
 
-            Assert.Equal(3, testGame.NumberOfUpdates);
+            A.CallTo(() => testGame.Update(A<TestInput>.Ignored)).MustHaveHappened(Repeated.Exactly.Times(3));
         }
 
         [Fact]
         public void InvokesRenderAfterUpdate()
         {
-            testGame.EnqueRunningAnswers(true, false);
-            testGame.RenderAction = () =>
-            {
-                if (testGame.NumberOfRenders != testGame.NumberOfUpdates - 1)
-                {
-                    throw new RenderBeforeUpdateException();
-                }
-                testGame.NumberOfRenders++;
-            };
+            A.CallTo(() => testGame.Running).ReturnsNextFromSequence(true, false);
 
             gameLoop.Run();
 
-            Assert.Equal(1, testGame.NumberOfRenders);
+            A.CallTo(() => testGame.Update(A<TestInput>.Ignored)).MustHaveHappened()
+                .Then(A.CallTo(() => testGame.Render()).MustHaveHappened());
         }
 
         [Fact]
         public void PassesInputToUpdate()
         {
             TestInput testInput = new TestInput();
-            testInputHandler.CurrentInput = testInput;
-            testGame.EnqueRunningAnswers(true, false);
+            A.CallTo(() => testInputHandler.CurrentInput).Returns(testInput);
+            A.CallTo(() => testGame.Running).ReturnsNextFromSequence(true, false);
 
             gameLoop.Run();
 
-            Assert.Same(testInput, testGame.UpdatedWithInput);
+            A.CallTo(() => testGame.Update(testInput)).MustHaveHappened();
         }
 
         [Fact]
         public void ShouldSkipUpdateIfLoopIsTooFast()
         {
-            testGame.EnqueRunningAnswers(true, false);
+            A.CallTo(() => testGame.Running).ReturnsNextFromSequence(true, false);
             gameLoop.FrameTime = 2.0;
 
             gameLoop.Run();
 
-            Assert.Equal(0, testGame.NumberOfUpdates);
-            Assert.Equal(1, testGame.NumberOfRenders);
+            A.CallTo(() => testGame.Update(A<TestInput>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => testGame.Render()).MustHaveHappened();
         }
 
         [Fact]
         public void ShouldDoAdditionalUpdateIfLoopIsTooSlow()
         {
-            testGame.EnqueRunningAnswers(true, false);
+            A.CallTo(() => testGame.Running).ReturnsNextFromSequence(true, false);
             gameLoop.FrameTime = 0.5;
 
             gameLoop.Run();
 
-            Assert.Equal(2, testGame.NumberOfUpdates);
-            Assert.Equal(1, testGame.NumberOfRenders);
+            A.CallTo(() => testGame.Update(A<TestInput>.Ignored)).MustHaveHappened(Repeated.Exactly.Times(2));
+            A.CallTo(() => testGame.Render()).MustHaveHappened(Repeated.Exactly.Times(1));
         }
 
         [Fact]
         public void DoesExecuteUpdateEventually()
         {
-            testGame.EnqueRunningAnswers(true, true, true, false);
+            A.CallTo(() => testGame.Running).ReturnsNextFromSequence(true, true, true, false);
             gameLoop.FrameTime = 2.0;
 
             gameLoop.Run();
 
-            Assert.True(testGame.NumberOfUpdates > 0);
+            A.CallTo(() => testGame.Update(A<TestInput>.Ignored)).MustHaveHappened();
         }
     }
 
